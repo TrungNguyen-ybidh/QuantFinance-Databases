@@ -7,10 +7,10 @@ import os
 load_dotenv()
 api_key = os.getenv('FMP_api')
 
-def fetch_data(url, name=''):
+def fetch_data(url):
     response = requests.get(url)
     df = pd.DataFrame(response.json())
-    return df.to_csv(name)
+    return df
     
 def fetch_fmp_comp_info(symbol_list, api_key):
     url = 'https://financialmodelingprep.com/stable/profile'
