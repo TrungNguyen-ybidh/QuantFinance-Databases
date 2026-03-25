@@ -6,7 +6,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from fetchers.endpoint_config import fmp_endpoints
+from config.endpoint_config import fmp_endpoints
 from config.utils import timer
 from pathlib import Path
 

@@ -12,11 +12,6 @@ fmp_endpoints = [
         "params": {}
     },
 
-     {
-        "endpoint": "quote-short",
-        "params": {}
-    },
-
     # --- Core Statements ---
     {
         "endpoint": "income-statement",
@@ -39,14 +34,6 @@ fmp_endpoints = [
     {
         "endpoint": "ratios",
         "params": { "limit": 30}
-    },
-    {
-        "endpoint": "key-metrics-ttm",
-        "params": {}
-    },
-    {
-        "endpoint": "ratios-ttm",
-        "params": {}
     },
 
      {
@@ -108,10 +95,6 @@ fmp_endpoints = [
         "params": {"period": "annual", "limit": 10, "page":0}
     },
 
-     {
-        "endpoint": "ratings-snapshot",
-        "params": {}
-    },
      {
         "endpoint": "ratings-historical",
         "params": {"limit": 1}
