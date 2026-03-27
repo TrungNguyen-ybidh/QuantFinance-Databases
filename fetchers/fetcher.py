@@ -4,13 +4,20 @@ import time
 from pathlib import Path
 from config.endpoint_config import fmp_endpoints
 import requests
+from fredapi import Fred
 
 class Fetcher:
-    def __init__(self, symbols, api_key = None, rootpath = None, period=None):
+    def __init__(self, symbols, api_key = None, rootpath = None, period=None, url=None):
         self.symbols = symbols
         self.api_key = api_key
         self.root = Path.cwd().parent
         self.period = period
+        self.url = url
+
+    def fetch_data(self):
+        response = requests.get(self.url)
+        df = pd.DataFrame(response.json())
+        return df
 
     def safe_dataframe(self, response, symbol, endpoint):
         """Validate API response and return a DataFrame or None."""
@@ -35,7 +42,6 @@ class Fetcher:
             df.to_csv(output_path, mode='w', header=True, index=False)
 
 
-
     def fetch_yf(self,interval="1d", start_date=None, end_date=None, chunk_size=50):
         self.symbols = [t for t in self.symbols if isinstance(t, str)]
         chunks = [self.symbols[i:i+chunk_size] for i in range(0, len(self.symbols), chunk_size)]
@@ -55,6 +61,16 @@ class Fetcher:
                 continue
         
         return pd.concat(dfs, ignore_index=True)
+    
+    def fetch_macro_data(self, sids):
+        fred = Fred(self.api_key)
+        df = pd.DataFrame({
+            name : fred.get_series(sid)
+            for sid, name in sids.items()
+        })
+        df.reset_index(inplace=True)
+        df.rename(columns={'index': 'date'}, inplace = True)
+        return df
     
     def fetch_fmp_data(self, time_sleep=0.171, endpoints_lst=None, limit=None):
         base_url = 'https://financialmodelingprep.com/stable'
