@@ -1,11 +1,9 @@
 from sqlalchemy import create_engine, text
+from pathlib import Path
+
+ROOT = Path.cwd().parent
 
 engine = create_engine(
-    "mysql+pymysql://tnguyen:thyngu123@192.168.1.26:3306/finance_db"
+    "mysql+pymysql://tnguyen:thyngu123@192.168.1.16:3306/finance_db"
 )
 
-
-with engine.connect() as conn:
-    result = conn.execute(text("SHOW TABLES;"))
-    for row in result:
-        print(row)
