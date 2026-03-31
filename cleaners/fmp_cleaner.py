@@ -1,7 +1,8 @@
 import ast
 import pandas as pd
-from config.config import ROOT
+from config.config import ROOT, engine
 from fetchers.fetcher import Fetcher 
+from sqlalchemy import text
 
 
 def parse_dict_col(file_path, col=None, col_lst=None):
@@ -74,3 +75,35 @@ def keep_and_rename(schema_map, input_file = ROOT, output_file = ROOT, action=No
             except Exception as e:
                 print(f"{key} - {e}")
         return result
+    
+def data_cleaning(df):
+    existing = pd.read_sql("SELECT ticker FROM companies", engine)
+    date_cols = [col for col in df.columns if 'date' in col.lower()]
+    df_clean = df[df['ticker'].isin(existing['ticker'])].copy()
+    
+    for col in date_cols:
+        df_clean[col] = pd.to_datetime(df_clean[col], errors='coerce')
+    
+    if 'period' in df.columns and 'date' in df.columns:
+        df_clean = df_clean.drop_duplicates(subset=['ticker', 'date', 'period'], keep='first')
+    elif 'date' in df.columns:
+        df_clean = df_clean.drop_duplicates(subset=['ticker', 'date'], keep='first')
+    else:
+        df_clean = df_clean.drop_duplicates()
+    
+    return df_clean
+
+def insert_to_sql(table, file=None, df=None):
+    if df is None and file is not None:
+        df = pd.read_csv(f"{ROOT}/data/cleanned/{file}")
+        print(f"{file}: {list(df.columns)}")
+        df_clean = data_cleaning(df)
+    elif df is None and file is not None:
+        print(f"{file}: {list(df.columns)}")
+        df_clean = data_cleaning(df)
+
+    with engine.connect() as conn:
+        conn.execute(text(f"TRUNCATE TABLE {table}"))
+        conn.commit()
+
+    df_clean.to_sql(table, engine, if_exists='append', index=False)
