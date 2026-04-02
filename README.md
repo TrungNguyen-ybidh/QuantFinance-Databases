@@ -168,3 +168,146 @@ This project is open source. See the repository for license details.
 **Built for quantitative research and algorithmic trading.**
 
 </div>
+=======
+# finance-db
+
+`finance-db` is a Python data pipeline project for collecting, cleaning, and loading financial market data.
+
+The project currently focuses on:
+- Fetching company fundamentals and ratios from Financial Modeling Prep (FMP)
+- Fetching macroeconomic series from FRED
+- Fetching market price data from Yahoo Finance
+- Standardizing CSV schemas for downstream analysis and SQL loading
+
+## Project Structure
+
+- `fetchers/`: data ingestion modules (`FMP`, `FRED`, `Yahoo Finance`)
+- `cleaners/`: data cleaning and schema transformation logic
+- `config/`: endpoint lists, schema maps, utility helpers, and SQL engine config
+- `data/raw/`: raw pulled datasets from APIs
+- `data/cleanned/`: cleaned/renamed datasets
+- `test/`: notebooks for exploratory testing and validation
+
+## Requirements
+
+- Python 3.10+ recommended
+- Access to:
+  - FMP API key
+  - FRED API key (for macro series)
+  - MySQL database (if using SQL loading utilities)
+
+## Installation
+
+```bash
+cd /Users/tnguyen287/Documents/finance-db
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirement.txt
+```
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+FMP_api=your_fmp_api_key
+FRED_api=your_fred_api_key
+```
+
+> `fetchers/fetching_fmp.py` reads `FMP_api` from `.env`.  
+> Other modules may accept API keys as function arguments.
+
+## Quick Start
+
+### 1) Fetch FMP data
+
+```python
+import os
+import pandas as pd
+from dotenv import load_dotenv
+from fetchers.fetching_fmp import fetch_fmp_data
+
+load_dotenv()
+api_key = os.getenv("FMP_api")
+
+symbols = pd.read_csv("data/symbols_filtered.csv")["symbol"].dropna().unique().tolist()
+fetch_fmp_data(symbols=symbols, api_key=api_key)
+```
+
+This writes endpoint CSVs into `data/raw/` (for example: `income-statement.csv`, `ratios.csv`, `profile.csv`).
+
+### 2) Fetch Yahoo Finance OHLCV data
+
+```python
+import pandas as pd
+from fetchers.fetch_yf import fetch_yf
+
+symbols = ["AAPL", "MSFT", "GOOGL"]
+price_df = fetch_yf(symbols, interval="1d", period="1y")
+price_df.to_csv("data/raw/yf_prices.csv", index=False)
+```
+
+### 3) Fetch FRED macro data
+
+```python
+import os
+from dotenv import load_dotenv
+from fetchers.fetch_fred import fetch_macro_data
+
+load_dotenv()
+series_map = {
+    "GDP": "gdp",
+    "CPIAUCSL": "cpi",
+    "FEDFUNDS": "fed_funds_rate",
+}
+
+macro_df = fetch_macro_data(series_map, api_key=os.getenv("FRED_api"))
+macro_df.to_csv("data/macro_data/macro_series.csv", index=False)
+```
+
+### 4) Apply schema cleaning / renaming
+
+```python
+from cleaners.fmp_cleaner import keep_and_rename
+from config.schema_config import schema_map
+
+keep_and_rename(
+    schema_map=schema_map,
+    input_file="data/raw",
+    output_file="data/cleanned",
+    action=None,  # keep + rename based on schema_map
+)
+```
+
+## SQL Loading Notes
+
+`cleaners/fmp_cleaner.py` includes `insert_to_sql(...)`, which:
+- reads cleaned CSVs,
+- deduplicates and type-cleans key columns,
+- truncates target MySQL table,
+- appends cleaned data.
+
+Before using SQL utilities, review and update connection settings in `config/config.py`.
+
+## Packaging
+
+This project is configured as a setuptools package via `pyproject.toml`:
+
+```bash
+pip install -e .
+```
+
+## Development Notes
+
+- There is a typo in directory naming: `data/cleanned/` (double `n`) is used in code and data paths; keep it consistent unless you rename all references.
+- `requirement.txt` contains both runtime and notebook/dev dependencies.
+- Notebook-based testing is available in `test/`.
+
+## Roadmap Ideas
+
+- Add CLI entry points for fetch/clean/load jobs
+- Add `.env.example` and move secrets out of source-controlled config
+- Add unit tests for schema transformations
+- Add incremental loading strategy instead of table truncation
+
