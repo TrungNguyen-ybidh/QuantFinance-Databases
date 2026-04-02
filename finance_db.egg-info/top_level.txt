@@ -1,4 +1,0 @@
-cleaners
-config
-data
-fetchers
