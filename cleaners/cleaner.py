@@ -32,7 +32,7 @@ class Cleaner:
         
         return df_clean
 
-    def insert_to_sql(self, table, file=None, df=None):
+    def insert_to_sql(self, table, drop=False, file=None, df=None):
         if df is None and file is not None:
             df = pd.read_csv(f"{self.root}/data/cleanned/{file}")
             print(f"{file}: {list(df.columns)}")
@@ -40,10 +40,10 @@ class Cleaner:
         elif df is not None:
             print(f"{table}: {list(df.columns)}")
             df_clean = self.data_cleaning(df)
-
-        with engine.connect() as conn:
-            conn.execute(text(f"TRUNCATE TABLE {table}"))
-            conn.commit()
+        if drop:    
+            with engine.connect() as conn:
+                conn.execute(text(f"TRUNCATE TABLE {table}"))
+                conn.commit()
 
         df_clean.to_sql(table, engine, if_exists='append', index=False)
 

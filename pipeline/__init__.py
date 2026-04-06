@@ -1,0 +1,1 @@
+from pipeline.fmp_pipeline import fmp_pipeline
