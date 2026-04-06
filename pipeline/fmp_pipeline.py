@@ -80,3 +80,7 @@ def fmp_pipeline(file_path, fetch_all=True):
             print(f"Inserted {len(new_data)} rows into {table}")
         else:
             print(f"No new data for {table}")
+
+
+if __name__ == '__main__':
+    fmp_pipeline(file_path='/Users/tnguyen287/Documents/finance-db/data/fmp_update')
