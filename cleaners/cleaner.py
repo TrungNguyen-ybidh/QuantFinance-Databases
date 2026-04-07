@@ -32,7 +32,7 @@ class Cleaner:
         
         return df_clean
 
-    def insert_to_sql(self, table, update=True, drop=False, file=None, df=None, conflict_cols=["ticker", "date"]):
+    def insert_to_sql(self, table, update=True, replace=False, file=None, df=None, conflict_cols=["ticker", "date"]):
         if df is None and file is not None:
             df = pd.read_csv(f"{self.root}/data/cleanned/{file}")
             print(f"{file}: {list(df.columns)}")
@@ -41,10 +41,12 @@ class Cleaner:
             print(f"{table}: {list(df.columns)}")
             df_clean = self.data_cleaning(df)
 
-        if drop:
+        if replace:
             with engine.connect() as conn:
                 conn.execute(text(f"TRUNCATE TABLE {table}"))
                 conn.commit()
+            df_clean.to_sql(table, engine, if_exists="append", index=False)
+            return
 
         if update:
             # Skip duplicates, only insert new rows
@@ -61,6 +63,8 @@ class Cleaner:
                 conn.commit()
         else:
             df_clean.to_sql(table, engine, if_exists="append", index=False)
+
+
     def parse_dict_col(self, file_path=None, col=None, col_lst=None):
         file_path = file_path or self.root
         fetcher = Fetcher()
