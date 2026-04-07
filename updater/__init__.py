@@ -1,0 +1,1 @@
+from updater.yfinance_updater import update_daily_data

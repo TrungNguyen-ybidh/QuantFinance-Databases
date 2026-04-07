@@ -3,14 +3,13 @@ from cleaners.cleaner import Cleaner, FMPCleaner
 from config.config import engine
 from config.fmp_endpoint import fmp_update_endpoints
 from config.schema_config import schema_map
-import pandas as pd 
-import os 
-from dotenv import load_dotenv
+from updater import update_daily_data
+import pandas as pd
+import os
 import glob
+from dotenv import load_dotenv
 
-
-def fmp_pipeline(file_path, fetch_all=True):
-    FILE_TO_TABLE = {
+FILE_TO_TABLE = {
     "enterprise-values.csv": "ev",
     "cash-flow-statement.csv": "cashflow",
     "income-statement-growth.csv": "income_stmt_growth",
@@ -25,10 +24,13 @@ def fmp_pipeline(file_path, fetch_all=True):
     "dividends.csv": "dividends",
     "analyst-estimates.csv": "estimates",
 }
+
+
+def update_pipeline(file_path, fetch_all=True):
     # --- Setup ---
-    symbols = pd.read_sql('SELECT ticker FROM companies', con=engine)['ticker'].tolist()
+    symbols = pd.read_sql("SELECT ticker FROM companies", con=engine)["ticker"].tolist()
     load_dotenv()
-    api = os.getenv('FMP_api')
+    api = os.getenv("FMP_api")
 
     fmp = FMPFetcher(symbols, api)
     fmp_clean = FMPCleaner(root=file_path)
@@ -38,7 +40,7 @@ def fmp_pipeline(file_path, fetch_all=True):
     if fetch_all:
         fmp.fetch_all(file_path=file_path, endpoint_config=fmp_update_endpoints)
     else:
-        fmp.fetch_endpoints(enpoint_lst=fmp_update_endpoints, file_path=file_path)
+        fmp.fetch_endpoints(endpoint_lst=fmp_update_endpoints, file_path=file_path)
 
     # --- Clean and rename columns ---
     fmp_clean.keep_and_rename(schema_map=schema_map, input_file=file_path)
@@ -49,38 +51,42 @@ def fmp_pipeline(file_path, fetch_all=True):
     for file in files:
         filename = os.path.basename(file)
 
-        # Skip files that don't have a table mapping
         if filename not in FILE_TO_TABLE:
             print(f"Skipping {filename} — no table mapping found")
             continue
 
         table = FILE_TO_TABLE[filename]
 
-        # Read and clean
-        df = pd.read_csv(file)
-        clean.data_cleaning(df, existent=False)
+        try:
+            df = pd.read_csv(file)
+            df = clean.data_cleaning(df, existent=False)
 
-        # Get the latest date per ticker already in the table
-        existing = pd.read_sql(f'''
-            SELECT ticker, MAX(date) as max_date
-            FROM {table}
-            GROUP BY ticker
-        ''', con=engine)
+            existing = pd.read_sql(
+                f"SELECT ticker, MAX(date) as max_date FROM {table} GROUP BY ticker",
+                con=engine,
+            )
 
-        # Keep only rows that are new
-        merged = df.merge(existing, on='ticker', how='left')
-        new_data = merged[
-            (merged['max_date'].isna()) | (merged['date'] > merged['max_date'])
-        ]
-        new_data = new_data.drop(columns=['max_date'])
+            merged = df.merge(existing, on="ticker", how="left")
+            merged["date"] = pd.to_datetime(merged["date"])
+            merged["max_date"] = pd.to_datetime(merged["max_date"])
 
-        # Insert
-        if not new_data.empty:
-            clean.insert_to_sql(table=table, df=new_data)
-            print(f"Inserted {len(new_data)} rows into {table}")
-        else:
-            print(f"No new data for {table}")
+            new_data = merged[
+                (merged["max_date"].isna()) | (merged["date"] > merged["max_date"])
+            ].drop(columns=["max_date"])
+
+            if not new_data.empty:
+                clean.insert_to_sql(table=table, df=new_data)
+                print(f"Inserted {len(new_data)} rows into {table}")
+            else:
+                print(f"No new data for {table}")
+
+        except Exception as e:
+            print(f"Failed on {filename}: {e}")
+            continue
+
+    # --- Update daily prices ---
+    update_daily_data(symbols, file_path=file_path)
 
 
-if __name__ == '__main__':
-    fmp_pipeline(file_path='/Users/tnguyen287/Documents/finance-db/data/fmp_update')
+if __name__ == "__main__":
+    update_pipeline(file_path="/Users/tnguyen287/Documents/finance-db/data/update")

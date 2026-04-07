@@ -48,7 +48,7 @@ class FMPFetcher(Fetcher):
 
     BASE_URL = "https://financialmodelingprep.com/stable"
 
-    def __init__(self, symbols=None, api_key=None, root=None, time_sleep=0.171):
+    def __init__(self, symbols=None, api_key=None, root=None, time_sleep=0.08):
         super().__init__(symbols, api_key, root)
         self.time_sleep = time_sleep
 
