@@ -32,7 +32,7 @@ class Cleaner:
         
         return df_clean
 
-    def insert_to_sql(self, table, drop=False, file=None, df=None):
+    def insert_to_sql(self, table, update=True, drop=False, file=None, df=None, conflict_cols=["ticker", "date"]):
         if df is None and file is not None:
             df = pd.read_csv(f"{self.root}/data/cleanned/{file}")
             print(f"{file}: {list(df.columns)}")
@@ -40,13 +40,27 @@ class Cleaner:
         elif df is not None:
             print(f"{table}: {list(df.columns)}")
             df_clean = self.data_cleaning(df)
-        if drop:    
+
+        if drop:
             with engine.connect() as conn:
                 conn.execute(text(f"TRUNCATE TABLE {table}"))
                 conn.commit()
 
-        df_clean.to_sql(table, engine, if_exists='append', index=False)
-
+        if update:
+            # Skip duplicates, only insert new rows
+            df_clean.to_sql("temp_staging", engine, if_exists="replace", index=False)
+            cols = ", ".join(df_clean.columns)
+            conflict = ", ".join(conflict_cols)
+            with engine.connect() as conn:
+                conn.execute(text(f"""
+                    INSERT INTO {table} ({cols})
+                    SELECT {cols} FROM temp_staging
+                    ON CONFLICT ({conflict}) DO NOTHING
+                """))
+                conn.execute(text("DROP TABLE temp_staging"))
+                conn.commit()
+        else:
+            df_clean.to_sql(table, engine, if_exists="append", index=False)
     def parse_dict_col(self, file_path=None, col=None, col_lst=None):
         file_path = file_path or self.root
         fetcher = Fetcher()

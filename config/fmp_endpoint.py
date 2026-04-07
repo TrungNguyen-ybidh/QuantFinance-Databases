@@ -102,12 +102,6 @@ fmp_endpoints = [
 ]
 
 fmp_update_endpoints = [
-    # --- Company Profile (snapshot, no history) ---
-    {
-        "endpoint": "profile",
-        "params": {}
-    },
-
     # --- Quote (snapshot, no history) ---
     {
         "endpoint": "quote",
@@ -119,15 +113,15 @@ fmp_update_endpoints = [
     # the latest release + any prior-quarter restatements
     {
         "endpoint": "income-statement",
-        "params": {"period": "quarter", "limit": 4}
+        "params": {"period": "quarter", "limit": 1}
     },
     {
         "endpoint": "balance-sheet-statement",
-        "params": {"period": "quarter", "limit": 4}
+        "params": {"period": "quarter", "limit": 1}
     },
     {
         "endpoint": "cash-flow-statement",
-        "params": {"period": "quarter", "limit": 4}
+        "params": {"period": "quarter", "limit": 1}
     },
 
     # --- Metrics & Ratios ---
@@ -152,7 +146,7 @@ fmp_update_endpoints = [
     # Annual: limit=2 for latest + prior year
     {
         "endpoint": "enterprise-values",
-        "params": {"period": "annual", "limit": 2}
+        "params": {"period": "annual", "limit": 1}
     },
     # DCF endpoints are point-in-time snapshots
     {
@@ -168,43 +162,43 @@ fmp_update_endpoints = [
     # Annual: limit=2 for latest + prior year
     {
         "endpoint": "income-statement-growth",
-        "params": {"period": "annual", "limit": 2}
+        "params": {"period": "annual", "limit": 1}
     },
     {
         "endpoint": "balance-sheet-statement-growth",
-        "params": {"period": "annual", "limit": 2}
+        "params": {"period": "annual", "limit": 1}
     },
     {
         "endpoint": "cash-flow-statement-growth",
-        "params": {"period": "annual", "limit": 2}
+        "params": {"period": "annual", "limit": 1}
     },
     {
         "endpoint": "financial-growth",
-        "params": {"period": "annual", "limit": 2}
+        "params": {"period": "annual", "limit": 1}
     },
 
     # --- Segmentation ---
     # Annual: limit=2 for latest + prior year
     {
         "endpoint": "revenue-product-segmentation",
-        "params": {"period": "annual", "limit": 2}
+        "params": {"period": "annual", "limit": 1}
     },
     {
         "endpoint": "revenue-geographic-segmentation",
-        "params": {"period": "annual", "limit": 2}
+        "params": {"period": "annual", "limit": 1}
     },
 
     # --- Dividends ---
     # limit=4 covers roughly the last year of quarterly dividends
     {
         "endpoint": "dividends",
-        "params": {"limit": 4}
+        "params": {"limit": 1}
     },
 
     # --- Analyst ---
     {
         "endpoint": "analyst-estimates",
-        "params": {"period": "annual", "limit": 2, "page": 0}
+        "params": {"period": "annual", "limit": 1, "page": 0}
     },
 
     # Ratings: already limit=1, perfect for updates
