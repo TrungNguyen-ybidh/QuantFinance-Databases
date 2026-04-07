@@ -8,6 +8,7 @@ import pandas as pd
 import os
 import glob
 from dotenv import load_dotenv
+import shutil
 
 FILE_TO_TABLE = {
     "enterprise-values.csv": "ev",
@@ -83,6 +84,12 @@ def update_pipeline(file_path, fetch_all=True):
         except Exception as e:
             print(f"Failed on {filename}: {e}")
             continue
+
+    # --- Clean up temp files ---
+    cleaned_dir = f"{file_path}/cleaned"
+    if os.path.exists(cleaned_dir):
+        shutil.rmtree(cleaned_dir)
+        print(f"Removed {cleaned_dir}")
 
     # --- Update daily prices ---
     update_daily_data(symbols, file_path=file_path)
