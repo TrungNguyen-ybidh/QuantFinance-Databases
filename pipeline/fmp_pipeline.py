@@ -1,8 +1,7 @@
 from fetchers.fetcher import FMPFetcher
 from cleaners.cleaner import Cleaner, FMPCleaner
 from config.config import engine
-from config.fmp_endpoint import fmp_update_endpoints
-from config.schema_config import schema_map
+from config.fmp_config import fmp_update_endpoints, schema_map
 from updater import update_daily_data, companies_info_update
 import pandas as pd
 import os

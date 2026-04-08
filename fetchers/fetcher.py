@@ -4,7 +4,7 @@ import pandas as pd
 import yfinance as yf
 from pathlib import Path
 from fredapi import Fred
-from config.fmp_endpoint import fmp_endpoints
+from config.fmp_config import fmp_endpoints
 
 
 
@@ -162,17 +162,21 @@ class FREDFetcher(Fetcher):
         super().__init__(api_key=api_key, root=root)
 
     def fetch(self, series_map):
-        """
-        Parameters
-        ----------
-        series_map : dict
-            {series_id: column_name}  e.g. {"DGS10": "10Y_yield"}
-        """
         fred = Fred(self.api_key)
-        df = pd.DataFrame({
-            name: fred.get_series(sid)
-            for sid, name in series_map.items()
-        })
+        results = {}
+        
+        for sid, name in series_map.items():
+            try:
+                results[name] = fred.get_series(sid)
+            except ValueError as e:
+                print(f"Skipping {sid} ({name}): {e}")
+                continue
+        
+        if not results:
+            print("No valid series found.")
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(results)
         df.reset_index(inplace=True)
         df.rename(columns={'index': 'date'}, inplace=True)
         return df
