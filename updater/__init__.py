@@ -1,1 +1,2 @@
 from updater.yfinance_updater import update_daily_data
+from updater.fmp_updater import companies_info_update

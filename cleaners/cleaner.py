@@ -5,6 +5,8 @@ from fetchers.fetcher import Fetcher
 from sqlalchemy import text
 from pathlib import Path
 from config.schema_config import schema_map
+import os
+import shutil
 
 class Cleaner:
     """Clean FMP fundamentals data: parse dict columns, keep/rename/drop fields."""
@@ -34,7 +36,7 @@ class Cleaner:
 
     def insert_to_sql(self, table, update=True, replace=False, file=None, df=None, conflict_cols=["ticker", "date"]):
         if df is None and file is not None:
-            df = pd.read_csv(f"{self.root}/data/cleanned/{file}")
+            df = pd.read_csv(f"{self.root}/cleaned/{file}")
             print(f"{file}: {list(df.columns)}")
             df_clean = self.data_cleaning(df)
         elif df is not None:
@@ -91,6 +93,12 @@ class Cleaner:
                 df = pd.concat([df.drop(columns=[col]), expanded], axis=1)
                 fetcher.save_csv(df, file_path=file_path)
                 return df
+            
+    def clean_dir(self):
+        cleaned_dir = f"{self.root}/cleaned"
+        if os.path.exists(cleaned_dir):
+            shutil.rmtree(cleaned_dir)
+            print(f"Removed {cleaned_dir}")
 
     
 class FMPCleaner(Cleaner):
@@ -99,7 +107,7 @@ class FMPCleaner(Cleaner):
 
     def keep_and_rename(self, schema_map=None, input_file=None, action=None):
         input_file = input_file or self.root
-        output_file = Path(f"{input_file}/cleanned")
+        output_file = Path(f"{input_file}/cleaned")
         output_file.mkdir(exist_ok=True)
         result = {}
         fetcher = Fetcher()
