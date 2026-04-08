@@ -1,4 +1,4 @@
-from .fmp_endpoint import fmp_endpoints, fmp_update_endpoints
-from .schema_config import schema_map
+from .fmp_config import fmp_endpoints, fmp_update_endpoints, schema_map
+from .fred_config import *
 from .config import engine, ROOT
 from .utils import timer

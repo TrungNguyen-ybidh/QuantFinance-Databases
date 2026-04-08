@@ -1,10 +1,9 @@
 import ast
 import pandas as pd
-from config.config import engine
+from config import engine
 from fetchers.fetcher import Fetcher 
 from sqlalchemy import text
 from pathlib import Path
-from config.schema_config import schema_map
 import os
 import shutil
 
