@@ -3,12 +3,11 @@ from cleaners.cleaner import Cleaner, FMPCleaner
 from config.config import engine
 from config.fmp_endpoint import fmp_update_endpoints
 from config.schema_config import schema_map
-from updater import update_daily_data
+from updater import update_daily_data, companies_info_update
 import pandas as pd
 import os
 import glob
 from dotenv import load_dotenv
-import shutil
 
 FILE_TO_TABLE = {
     "enterprise-values.csv": "ev",
@@ -27,7 +26,7 @@ FILE_TO_TABLE = {
 }
 
 
-def update_pipeline(file_path, fetch_all=True):
+def update_pipeline(file_path):
     # --- Setup ---
     symbols = pd.read_sql("SELECT ticker FROM companies", con=engine)["ticker"].tolist()
     load_dotenv()
@@ -37,12 +36,13 @@ def update_pipeline(file_path, fetch_all=True):
     fmp_clean = FMPCleaner(root=file_path)
     clean = Cleaner(root=file_path)
 
-    # --- Fetch data from FMP API ---
-    if fetch_all:
-        fmp.fetch_all(file_path=file_path, endpoint_config=fmp_update_endpoints)
-    else:
-        fmp.fetch_endpoints(endpoint_lst=fmp_update_endpoints, file_path=file_path)
+    #---update companies info first---
+    companies_info_update(symbols=symbols, api=api)
+    # --- Clean up temp files ---
+    clean.clean_dir()
 
+    # --- Fetch data from FMP API ---
+    fmp.fetch_all(file_path=file_path, endpoint_config=fmp_update_endpoints)
     # --- Clean and rename columns ---
     fmp_clean.keep_and_rename(schema_map=schema_map, input_file=file_path)
 
@@ -60,13 +60,11 @@ def update_pipeline(file_path, fetch_all=True):
 
         try:
             df = pd.read_csv(file)
-            df = clean.data_cleaning(df, existent=False)
 
             existing = pd.read_sql(
                 f"SELECT ticker, MAX(date) as max_date FROM {table} GROUP BY ticker",
                 con=engine,
             )
-
             merged = df.merge(existing, on="ticker", how="left")
             merged["date"] = pd.to_datetime(merged["date"])
             merged["max_date"] = pd.to_datetime(merged["max_date"])
@@ -86,13 +84,13 @@ def update_pipeline(file_path, fetch_all=True):
             continue
 
     # --- Clean up temp files ---
-    cleaned_dir = f"{file_path}/cleaned"
-    if os.path.exists(cleaned_dir):
-        shutil.rmtree(cleaned_dir)
-        print(f"Removed {cleaned_dir}")
+    clean.clean_dir()
 
     # --- Update daily prices ---
     update_daily_data(symbols, file_path=file_path)
+
+    # --- Clean up temp files ---
+    clean.clean_dir()
 
 
 if __name__ == "__main__":
