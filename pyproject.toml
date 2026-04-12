@@ -7,4 +7,4 @@ name = "finance-db"
 version = "0.1.0"
 
 [tool.setuptools.packages.find]
-include = ["fetchers*", "config*", "cleaners*", "pipline*", "data*", "pipeline*]
+include = ["fetchers*", "config*", "cleaners*", "data*", "updater*", "pipeline"]

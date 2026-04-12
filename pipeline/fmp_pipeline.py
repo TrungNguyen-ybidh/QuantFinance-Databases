@@ -1,6 +1,6 @@
 from fetchers.fetcher import FMPFetcher
 from cleaners.cleaner import Cleaner, FMPCleaner
-from config.config import engine
+from config.config import engine, ROOT
 from config.fmp_config import fmp_update_endpoints, schema_map
 from updater import update_daily_data, companies_info_update
 import pandas as pd
@@ -28,6 +28,7 @@ FILE_TO_TABLE = {
 def update_pipeline(file_path):
     # --- Setup ---
     symbols = pd.read_sql("SELECT ticker FROM companies", con=engine)["ticker"].tolist()
+    symbols = symbols[:1]
     load_dotenv()
     api = os.getenv("FMP_api")
 
@@ -92,5 +93,3 @@ def update_pipeline(file_path):
     clean.clean_dir()
 
 
-if __name__ == "__main__":
-    update_pipeline(file_path="/Users/tnguyen287/Documents/finance-db/data/update")
