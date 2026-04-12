@@ -1,1 +1,1 @@
-from pipeline.fmp_pipeline import fmp_pipeline
+from pipeline.fmp_pipeline import update_pipeline, FILE_TO_TABLE
