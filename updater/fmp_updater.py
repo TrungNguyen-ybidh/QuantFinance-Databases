@@ -53,7 +53,7 @@ def companies_info_update(symbols, api):
 
     fetch_fmp.fetch_all(file_path=file_path, endpoint_config=endpoint)
     fmp_cleaner.keep_and_rename(schema_map=schema_map)
-    cleaner.insert_to_sql(table="companies", replace=False, file='profile.csv')
+    cleaner.insert_to_sql(table="companies", replace=True, file='profile.csv')
 
 
 

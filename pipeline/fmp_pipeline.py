@@ -28,7 +28,6 @@ FILE_TO_TABLE = {
 def update_pipeline(file_path):
     # --- Setup ---
     symbols = pd.read_sql("SELECT ticker FROM companies", con=engine)["ticker"].tolist()
-    symbols = symbols[:1]
     load_dotenv()
     api = os.getenv("FMP_api")
 
@@ -36,10 +35,6 @@ def update_pipeline(file_path):
     fmp_clean = FMPCleaner(root=file_path)
     clean = Cleaner(root=file_path)
 
-    #---update companies info first---
-    companies_info_update(symbols=symbols, api=api)
-    # --- Clean up temp files ---
-    clean.clean_dir()
 
     # --- Fetch data from FMP API ---
     fmp.fetch_all(file_path=file_path, endpoint_config=fmp_update_endpoints)
@@ -93,3 +88,5 @@ def update_pipeline(file_path):
     clean.clean_dir()
 
 
+if __name__ == "__main__":
+    update_pipeline(file_path=f"{ROOT}/data/update")

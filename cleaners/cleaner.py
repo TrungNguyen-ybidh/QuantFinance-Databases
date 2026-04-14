@@ -56,9 +56,8 @@ class Cleaner:
             conflict = ", ".join(conflict_cols)
             with engine.connect() as conn:
                 conn.execute(text(f"""
-                    INSERT INTO {table} ({cols})
+                    INSERT IGNORE INTO {table} ({cols})
                     SELECT {cols} FROM temp_staging
-                    ON CONFLICT ({conflict}) DO NOTHING
                 """))
                 conn.execute(text("DROP TABLE temp_staging"))
                 conn.commit()
