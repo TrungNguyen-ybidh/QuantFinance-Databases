@@ -15,25 +15,25 @@ fmp_endpoints = [
     # --- Core Statements ---
     {
         "endpoint": "income-statement",
-        "params": {"period": "quarter", "limit": 30}
+        "params": {"period": "quarter", "limit": 1000}
     },
     {
         "endpoint": "balance-sheet-statement",
-        "params": {"period": "quarter", "limit": 30}
+        "params": {"period": "quarter", "limit": 1000}
     },
     {
         "endpoint": "cash-flow-statement",
-        "params": {"period": "quarter", "limit": 30}
+        "params": {"period": "quarter", "limit": 1000}
     },
 
     # --- Metrics & Ratios ---
     {
         "endpoint": "key-metrics",
-        "params": {"limit": 30}
+        "params": {"limit": 1000}
     },
     {
         "endpoint": "ratios",
-        "params": { "limit": 30}
+        "params": { "limit": 1000}
     },
 
      {
@@ -44,7 +44,7 @@ fmp_endpoints = [
     # --- Valuation ---
     {
         "endpoint": "enterprise-values",
-        "params": {"period": "annual", "limit": 30}
+        "params": {"period": "annual", "limit": 1000}
     },
     {
         "endpoint": "discounted-cash-flow",
@@ -58,46 +58,46 @@ fmp_endpoints = [
     # --- Growth ---
     {
         "endpoint": "income-statement-growth",
-        "params": {"period": "annual", "limit": 30}
+        "params": {"period": "annual", "limit": 1000}
     },
     {
         "endpoint": "balance-sheet-statement-growth",
-        "params": {"period": "annual", "limit": 30}
+        "params": {"period": "annual", "limit": 1000}
     },
     {
         "endpoint": "cash-flow-statement-growth",
-        "params": {"period": "annual", "limit": 30}
+        "params": {"period": "annual", "limit": 1000}
     },
     {
         "endpoint": "financial-growth",
-        "params": {"period": "annual", "limit": 30}
+        "params": {"period": "annual", "limit": 1000}
     },
 
     # --- Segmentation ---
     {
         "endpoint": "revenue-product-segmentation",
-        "params": {"period": "annual", "limit": 30}
+        "params": {"period": "annual", "limit": 1000}
     },
     {
         "endpoint": "revenue-geographic-segmentation",
-        "params": {"period": "annual", "limit": 30}
+        "params": {"period": "annual", "limit": 1000}
     },
 
     # --- Dividends ---
     {
         "endpoint": "dividends",
-        "params": {"limit": 20}
+        "params": {"limit": 1000}
     },
 
     # --- Analyst --- 
      {
         "endpoint": "analyst-estimates",
-        "params": {"period": "annual", "limit": 10, "page":0}
+        "params": {"period": "annual", "limit": 1000, "page":0}
     },
 
      {
         "endpoint": "ratings-historical",
-        "params": {"limit": 1}
+        "params": {"limit": 1000}
     },
 ]
 
