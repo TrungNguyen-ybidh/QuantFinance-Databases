@@ -14,6 +14,7 @@ class Cleaner:
 
     def data_cleaning(self, df, existent=True):
         if existent:
+            df.columns = df.columns.str.lower()
             existing = pd.read_sql("SELECT ticker FROM companies", engine)
             df_clean = df[df['ticker'].isin(existing['ticker'])].copy()
         else:
@@ -52,7 +53,7 @@ class Cleaner:
         if update:
             # Skip duplicates, only insert new rows
             df_clean.to_sql("temp_staging", engine, if_exists="replace", index=False)
-            cols = ", ".join(df_clean.columns)
+            cols = ", ".join([f"`{c}`" for c in df_clean.columns])
             conflict = ", ".join(conflict_cols)
             with engine.connect() as conn:
                 conn.execute(text(f"""
