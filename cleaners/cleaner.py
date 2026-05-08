@@ -1,169 +1,160 @@
+"""Generic and FMP-specific data cleaners + DB load helpers."""
 import ast
-import pandas as pd
-from config import engine
-from fetchers.fetcher import Fetcher 
-from sqlalchemy import text
-from pathlib import Path
-import os
 import shutil
+from pathlib import Path
+
+import pandas as pd
+from sqlalchemy import text
+
+from config import engine
+from fetchers.fetcher import Fetcher
+
 
 class Cleaner:
-    """Clean FMP fundamentals data: parse dict columns, keep/rename/drop fields."""
+    """Clean tabular data and load it into MySQL."""
+
     def __init__(self, root):
         self.root = Path(root) if root else Path.cwd().parent
 
-    def ff_factor_clean(self, df, monthly=False, quarterly=False):
-        '''
-        make sure that when convert to csv, set infex = FALSE
-        '''
+    # ---------- transformations ---------- #
 
-        df.columns= df.columns.str.lower()
+    def ff_factor_clean(self, df, monthly=False, quarterly=False):
+        """Normalize Fama-French factor exports. Caller passes index=False on save."""
+        df.columns = df.columns.str.lower()
         df_clean = df.rename(columns={
-            'unnamed: 0': 'date', 
-            'mkt-rf': 'market_excess_return', 
-            'smb': 'size_factor', 
-            'hml': 'value_factor', 
-            'rmw': 'profitability_factor', 
-            'cma': 'inveatment_factor', 
-            'rf': 'risk_free_rate'
+            "unnamed: 0": "date",
+            "mkt-rf": "market_excess_return",
+            "smb": "size_factor",
+            "hml": "value_factor",
+            "rmw": "profitability_factor",
+            "cma": "investment_factor",
+            "rf": "risk_free_rate",
         })
-        df_clean['date'] = pd.to_datetime(df_clean['date'].astype('str'), format='%Y%m%d')
+        df_clean["date"] = pd.to_datetime(df_clean["date"].astype(str), format="%Y%m%d")
 
         if monthly or quarterly:
-            df_clean = df_clean.set_index('date')
-            if monthly:
-                return df_clean.resample('ME').sum().round(2).reset_index()
-            else:
-                return df_clean.resample('QE').sum().round(2).reset_index()
-        
+            df_clean = df_clean.set_index("date")
+            rule = "ME" if monthly else "QE"
+            return df_clean.resample(rule).sum().round(2).reset_index()
+
         return df_clean
 
-    def data_cleaning(self, df, existent=True):
+    def data_cleaning(self, df, existent=False):
+        """Parse date columns and drop duplicates on the natural key."""
         if existent:
-            df.columns = df.columns.str.lower()
             existing = pd.read_sql("SELECT ticker FROM companies", engine)
-            df_clean = df[df['ticker'].isin(existing['ticker'])].copy()
+            df_clean = df[df["ticker"].isin(existing["ticker"])].copy()
         else:
             df_clean = df.copy()
 
-        date_cols = [col for col in df.columns if 'date' in col.lower()]
-        
-        for col in date_cols:
-            df_clean[col] = pd.to_datetime(df_clean[col], errors='coerce')
-        
-        if 'period' in df.columns and 'date' in df.columns:
-            df_clean = df_clean.drop_duplicates(subset=['ticker', 'date', 'period'], keep='first')
-        elif 'date' in df.columns:
-            df_clean = df_clean.drop_duplicates(subset=['ticker', 'date'], keep='first')
-        else:
-            df_clean = df_clean.drop_duplicates()
-        
-        return df_clean
+        for col in [c for c in df_clean.columns if "date" in c.lower()]:
+            df_clean[col] = pd.to_datetime(df_clean[col], errors="coerce")
 
-    def insert_to_sql(self, table, update=True, clean=True, replace=False, exist=False ,file=None, df=None, conflict_cols=["ticker", "date"]):
+        has = lambda c: c in df_clean.columns
+        if has("ticker") and has("date") and has("period"):
+            return df_clean.drop_duplicates(subset=["ticker", "date", "period"], keep="first")
+        if has("ticker") and has("date"):
+            return df_clean.drop_duplicates(subset=["ticker", "date"], keep="first")
+        if has("date"):
+            return df_clean.drop_duplicates(subset=["date"], keep="first")
+        return df_clean.drop_duplicates()
 
+    # ---------- DB load ---------- #
+
+    def insert_to_sql(self, table, df=None, file=None, *,
+                      mode="update", clean=True, exist=False):
+        """Load `df` (or a CSV at `file`) into `table`.
+
+        mode:
+          "update"  -> INSERT IGNORE via temp_staging (skip duplicates;
+                       conflict resolution uses the table's PK/UNIQUE keys).
+          "replace" -> TRUNCATE then append.
+          "append"  -> plain df.to_sql append (caller handles duplicates).
+        """
         if df is None and file is not None:
-            df = pd.read_csv(f"{self.root}/cleaned/{file}")
+            path = self.root / ("cleaned" if clean else "") / file
+            df = pd.read_csv(path)
             print(f"{file}: {list(df.columns)}")
-            if clean:
-                if exist:
-                    df_clean = self.data_cleaning(df)
-                else:
-                    df_clean = self.data_cleaning(df, existent=False)
-
         elif df is not None:
             print(f"{table}: {list(df.columns)}")
-            df_clean = self.data_cleaning(df)
+        else:
+            raise ValueError("Provide either df or file")
 
-        if replace:
+        df_clean = self.data_cleaning(df, existent=exist) if clean else df
+
+        if mode == "replace":
             with engine.connect() as conn:
                 conn.execute(text("SET FOREIGN_KEY_CHECKS = 0"))
                 conn.execute(text(f"TRUNCATE TABLE {table}"))
                 conn.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
-                conn.commit()
-                df_clean.to_sql(table, conn, if_exists="append", index=False)
+                df_clean.dropna(subset=["date"]).to_sql(table, conn, if_exists="append", index=False)
                 conn.commit()
             return
 
-        elif update:
-            # Skip duplicates, only insert new rows
-            df_clean.to_sql("temp_staging", engine, if_exists="replace", index=False)
-            cols = ", ".join([f"`{c}`" for c in df_clean.columns])
-            conflict = ", ".join(conflict_cols)
-            with engine.connect() as conn:
-                conn.execute(text(f"""
-                    INSERT IGNORE INTO {table} ({cols})
-                    SELECT {cols} FROM temp_staging
-                """))
-                conn.execute(text("DROP TABLE temp_staging"))
-                conn.commit()
-        else:
+        if mode == "append":
             df_clean.to_sql(table, engine, if_exists="append", index=False)
+            return
 
+        # default: update via INSERT IGNORE
+        df_clean.to_sql("temp_staging", engine, if_exists="replace", index=False)
+        cols = ", ".join(f"`{c}`" for c in df_clean.columns)
+        with engine.connect() as conn:
+            conn.execute(text(f"INSERT IGNORE INTO {table} ({cols}) SELECT {cols} FROM temp_staging"))
+            conn.execute(text("DROP TABLE temp_staging"))
+            conn.commit()
+
+    # ---------- helpers ---------- #
 
     def parse_dict_col(self, file_path=None, col=None, col_lst=None):
+        """Expand JSON/dict-valued columns in-place. Saves back to disk."""
         file_path = file_path or self.root
-        fetcher = Fetcher()
         df = pd.read_csv(file_path, low_memory=False)
-        if col is None and col_lst is not None:
-            for col in col_lst:
-                try: 
-                    expanded = pd.json_normalize(df[col])
-                    df = pd.concat([df.drop(columns=[col]), expanded], axis=1)
-                except Exception as e:
-                        df[col] = df[col].apply(ast.literal_eval)
-                        expanded = pd.json_normalize(df[col])
-                        df = pd.concat([df.drop(columns=[col]), expanded], axis=1)
-            fetcher.save_csv(df, file_path=file_path)
+
+        cols = col_lst if col_lst else ([col] if col else [])
+        if not cols:
             return df
-        if col is not None and col_lst is None:
-            try: 
-                expanded = pd.json_normalize(df[col])
-                df = pd.concat([df.drop(columns=[col]), expanded], axis=1)
-                return df
-            except Exception as e:
-                df[col] = df[col].apply(ast.literal_eval)
-                expanded = pd.json_normalize(df[col])
-                df = pd.concat([df.drop(columns=[col]), expanded], axis=1)
-                fetcher.save_csv(df, file_path=file_path)
-                return df
-            
+
+        for c in cols:
+            try:
+                expanded = pd.json_normalize(df[c])
+            except Exception:
+                expanded = pd.json_normalize(df[c].apply(ast.literal_eval))
+            df = pd.concat([df.drop(columns=[c]), expanded], axis=1)
+
+        Fetcher().save_csv(df, file_path=file_path)
+        return df
+
     def clean_dir(self):
-        cleaned_dir = f"{self.root}/cleaned"
-        if os.path.exists(cleaned_dir):
-            shutil.rmtree(cleaned_dir)
-            print(f"Removed {cleaned_dir}")
+        cleaned = self.root / "cleaned"
+        if cleaned.exists():
+            shutil.rmtree(cleaned)
+            print(f"Removed {cleaned}")
 
-    
+
 class FMPCleaner(Cleaner):
-    def __init__(self, root):
-        super().__init__(root)
+    """FMP-specific column filtering/renaming via schema_map."""
 
-    def keep_and_rename(self, schema_map=None, input_file=None, action=None):
-        input_file = input_file or self.root
-        output_file = Path(f"{input_file}/cleaned")
-        output_file.mkdir(exist_ok=True)
+    def keep_and_rename(self, schema_map, input_file=None, action=None):
+        input_dir = Path(input_file) if input_file else Path(self.root)
+        output_dir = input_dir / "cleaned"
+        output_dir.mkdir(exist_ok=True)
         result = {}
         fetcher = Fetcher()
 
-        for key, value in schema_map.items():
+        for filename, spec in schema_map.items():
             try:
-                df = pd.read_csv(f"{input_file}/{key}", low_memory=False)
-
+                df = pd.read_csv(input_dir / filename, low_memory=False)
                 if action is None:
-                    # default: keep columns then rename
-                    df = df[value["keep"]]
-                    df = df.rename(columns=value["rename"])
+                    df = df[spec["keep"]].rename(columns=spec["rename"])
                 elif action == "keep":
-                    df = df[value["keep"]]
+                    df = df[spec["keep"]]
                 elif action == "rename":
-                    df = df.rename(columns=value["rename"])
+                    df = df.rename(columns=spec["rename"])
                 elif action == "drop":
-                    df = df.drop(columns=value["drop"])
-
-                fetcher.save_csv(df, file_path=f"{output_file}/{key}")
-                result[key] = df
+                    df = df.drop(columns=spec["drop"])
+                fetcher.save_csv(df, file_path=str(output_dir / filename))
+                result[filename] = df
             except Exception as e:
-                print(f"{key} — {e}")
+                print(f"{filename} — {e}")
 
         return result

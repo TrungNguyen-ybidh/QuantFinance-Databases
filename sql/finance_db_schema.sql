@@ -1,39 +1,78 @@
--- MySQL dump 10.13  Distrib 9.6.0, for macos26.2 (arm64)
---
--- Host: 127.0.0.1    Database: 
--- ------------------------------------------------------
--- Server version	9.4.0
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
-/*!50606 SET @OLD_INNODB_STATS_AUTO_RECALC=@@INNODB_STATS_AUTO_RECALC */;
-/*!50606 SET GLOBAL INNODB_STATS_AUTO_RECALC=OFF */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
---
-
-
-
---
--- Current Database: `finance_db`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `finance_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-
-USE `finance_db`;
-
---
--- Table structure for table `balance_sheet`
---
-
+DROP TABLE IF EXISTS `asset_class_returns_daily`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_class_returns_daily` (
+  `date` date NOT NULL,
+  `bitcoin` decimal(10,4) DEFAULT NULL,
+  `real_estate` decimal(10,4) DEFAULT NULL,
+  `us_agg_bonds` decimal(10,4) DEFAULT NULL,
+  `large_cap_growth` decimal(10,4) DEFAULT NULL,
+  `large_cap_value` decimal(10,4) DEFAULT NULL,
+  `small_cap` decimal(10,4) DEFAULT NULL,
+  `long_term_treasury` decimal(10,4) DEFAULT NULL,
+  `equal_weight_sp500` decimal(10,4) DEFAULT NULL,
+  `emerging_markets` decimal(10,4) DEFAULT NULL,
+  `short_term_treasury` decimal(10,4) DEFAULT NULL,
+  `intl_developed` decimal(10,4) DEFAULT NULL,
+  `gold` decimal(10,4) DEFAULT NULL,
+  `oil` decimal(10,4) DEFAULT NULL,
+  `us_large_cap` decimal(10,4) DEFAULT NULL,
+  `high_yield_bonds` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `asset_class_returns_monthly`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_class_returns_monthly` (
+  `date` date NOT NULL,
+  `bitcoin` decimal(10,4) DEFAULT NULL,
+  `real_estate` decimal(10,4) DEFAULT NULL,
+  `us_agg_bonds` decimal(10,4) DEFAULT NULL,
+  `large_cap_growth` decimal(10,4) DEFAULT NULL,
+  `large_cap_value` decimal(10,4) DEFAULT NULL,
+  `small_cap` decimal(10,4) DEFAULT NULL,
+  `long_term_treasury` decimal(10,4) DEFAULT NULL,
+  `equal_weight_sp500` decimal(10,4) DEFAULT NULL,
+  `emerging_markets` decimal(10,4) DEFAULT NULL,
+  `short_term_treasury` decimal(10,4) DEFAULT NULL,
+  `intl_developed` decimal(10,4) DEFAULT NULL,
+  `gold` decimal(10,4) DEFAULT NULL,
+  `oil` decimal(10,4) DEFAULT NULL,
+  `us_large_cap` decimal(10,4) DEFAULT NULL,
+  `high_yield_bonds` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `asset_class_returns_quarterly`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_class_returns_quarterly` (
+  `date` date NOT NULL,
+  `bitcoin` decimal(10,4) DEFAULT NULL,
+  `real_estate` decimal(10,4) DEFAULT NULL,
+  `us_agg_bonds` decimal(10,4) DEFAULT NULL,
+  `large_cap_growth` decimal(10,4) DEFAULT NULL,
+  `large_cap_value` decimal(10,4) DEFAULT NULL,
+  `small_cap` decimal(10,4) DEFAULT NULL,
+  `long_term_treasury` decimal(10,4) DEFAULT NULL,
+  `equal_weight_sp500` decimal(10,4) DEFAULT NULL,
+  `emerging_markets` decimal(10,4) DEFAULT NULL,
+  `short_term_treasury` decimal(10,4) DEFAULT NULL,
+  `intl_developed` decimal(10,4) DEFAULT NULL,
+  `gold` decimal(10,4) DEFAULT NULL,
+  `oil` decimal(10,4) DEFAULT NULL,
+  `us_large_cap` decimal(10,4) DEFAULT NULL,
+  `high_yield_bonds` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `balance_sheet`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -42,44 +81,39 @@ CREATE TABLE `balance_sheet` (
   `date` date NOT NULL,
   `fiscal_year` varchar(10) DEFAULT NULL,
   `period` varchar(10) NOT NULL,
-  `cash` bigint DEFAULT NULL,
+  `cash` double DEFAULT NULL,
   `short_term_investments` double DEFAULT NULL,
-  `cash_and_short_term_investments` bigint DEFAULT NULL,
+  `cash_and_short_term_investments` double DEFAULT NULL,
   `net_receivables` double DEFAULT NULL,
   `inventory` double DEFAULT NULL,
   `total_current_assets` double DEFAULT NULL,
   `ppe_net` double DEFAULT NULL,
-  `goodwill` bigint DEFAULT NULL,
-  `intangible_assets` bigint DEFAULT NULL,
+  `goodwill` double DEFAULT NULL,
+  `intangible_assets` double DEFAULT NULL,
   `long_term_investments` double DEFAULT NULL,
   `tax_assets` double DEFAULT NULL,
   `total_non_current_assets` double DEFAULT NULL,
   `total_assets` double DEFAULT NULL,
-  `accounts_payable` bigint DEFAULT NULL,
-  `accrued_expenses` bigint DEFAULT NULL,
+  `accounts_payable` double DEFAULT NULL,
+  `accrued_expenses` double DEFAULT NULL,
   `short_term_debt` double DEFAULT NULL,
-  `deferred_revenue` bigint DEFAULT NULL,
+  `deferred_revenue` double DEFAULT NULL,
   `total_current_liabilities` double DEFAULT NULL,
   `long_term_debt` double DEFAULT NULL,
   `total_non_current_liabilities` double DEFAULT NULL,
   `total_liabilities` double DEFAULT NULL,
   `retained_earnings` double DEFAULT NULL,
-  `additional_paid_in_capital` bigint DEFAULT NULL,
+  `additional_paid_in_capital` double DEFAULT NULL,
   `stockholders_equity` double DEFAULT NULL,
   `total_equity` double DEFAULT NULL,
   `total_debt` double DEFAULT NULL,
   `net_debt` double DEFAULT NULL,
+  `filing_date` datetime DEFAULT NULL,
+  `accepted_date` datetime DEFAULT NULL,
   PRIMARY KEY (`ticker`,`date`,`period`),
   CONSTRAINT `balance_sheet_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `balance_sheet_growth`
---
-
 DROP TABLE IF EXISTS `balance_sheet_growth`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -99,13 +133,6 @@ CREATE TABLE `balance_sheet_growth` (
   CONSTRAINT `balance_sheet_growth_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `cashflow`
---
-
 DROP TABLE IF EXISTS `cashflow`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -134,17 +161,12 @@ CREATE TABLE `cashflow` (
   `free_cash_flow` double DEFAULT NULL,
   `income_taxes_paid` double DEFAULT NULL,
   `interest_paid` double DEFAULT NULL,
+  `filing_date` datetime DEFAULT NULL,
+  `accepted_date` datetime DEFAULT NULL,
   PRIMARY KEY (`ticker`,`date`,`period`),
   CONSTRAINT `cashflow_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `cashflow_growth`
---
-
 DROP TABLE IF EXISTS `cashflow_growth`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -162,13 +184,6 @@ CREATE TABLE `cashflow_growth` (
   CONSTRAINT `cashflow_growth_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `companies`
---
-
 DROP TABLE IF EXISTS `companies`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -186,19 +201,28 @@ CREATE TABLE `companies` (
   `cusip` varchar(20) DEFAULT NULL,
   `exchange` varchar(20) DEFAULT NULL,
   `ceo` varchar(100) DEFAULT NULL,
-  `full_time_employees` int DEFAULT NULL,
+  `full_time_employees` bigint DEFAULT NULL,
   `ipo_date` date DEFAULT NULL,
   `description` text,
   PRIMARY KEY (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `dcf`
---
-
+DROP TABLE IF EXISTS `daily_prices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `daily_prices` (
+  `date` datetime NOT NULL,
+  `ticker` varchar(10) NOT NULL,
+  `close` double DEFAULT NULL,
+  `high` double DEFAULT NULL,
+  `low` double DEFAULT NULL,
+  `open` double DEFAULT NULL,
+  `volume` double DEFAULT NULL,
+  PRIMARY KEY (`date`,`ticker`),
+  KEY `ticker` (`ticker`),
+  CONSTRAINT `daily_prices_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `dcf`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -211,13 +235,6 @@ CREATE TABLE `dcf` (
   CONSTRAINT `dcf_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `dcf_levered`
---
-
 DROP TABLE IF EXISTS `dcf_levered`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -230,13 +247,6 @@ CREATE TABLE `dcf_levered` (
   CONSTRAINT `dcf_levered_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `dividends`
---
-
 DROP TABLE IF EXISTS `dividends`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -251,13 +261,6 @@ CREATE TABLE `dividends` (
   CONSTRAINT `dividends_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `estimates`
---
-
 DROP TABLE IF EXISTS `estimates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -274,13 +277,6 @@ CREATE TABLE `estimates` (
   CONSTRAINT `estimates_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `ev`
---
-
 DROP TABLE IF EXISTS `ev`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -297,13 +293,48 @@ CREATE TABLE `ev` (
   CONSTRAINT `ev_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `growth`
---
-
+DROP TABLE IF EXISTS `factors_daily`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `factors_daily` (
+  `date` date NOT NULL,
+  `market_excess_return` decimal(10,4) DEFAULT NULL,
+  `size_factor` decimal(10,4) DEFAULT NULL,
+  `value_factor` decimal(10,4) DEFAULT NULL,
+  `profitability_factor` decimal(10,4) DEFAULT NULL,
+  `inveatment_factor` decimal(10,4) DEFAULT NULL,
+  `risk_free_rate` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `factors_monthly`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `factors_monthly` (
+  `date` date NOT NULL,
+  `market_excess_return` decimal(10,4) DEFAULT NULL,
+  `size_factor` decimal(10,4) DEFAULT NULL,
+  `value_factor` decimal(10,4) DEFAULT NULL,
+  `profitability_factor` decimal(10,4) DEFAULT NULL,
+  `inveatment_factor` decimal(10,4) DEFAULT NULL,
+  `risk_free_rate` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `factors_quarterly`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `factors_quarterly` (
+  `date` date NOT NULL,
+  `market_excess_return` decimal(10,4) DEFAULT NULL,
+  `size_factor` decimal(10,4) DEFAULT NULL,
+  `value_factor` decimal(10,4) DEFAULT NULL,
+  `profitability_factor` decimal(10,4) DEFAULT NULL,
+  `inveatment_factor` decimal(10,4) DEFAULT NULL,
+  `risk_free_rate` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `growth`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -311,7 +342,6 @@ CREATE TABLE `growth` (
   `ticker` varchar(10) NOT NULL,
   `date` date NOT NULL,
   `fiscal_year` varchar(10) DEFAULT NULL,
-  `period` varchar(10) NOT NULL,
   `revenue_growth` double DEFAULT NULL,
   `gross_profit_growth` double DEFAULT NULL,
   `operating_income_growth` double DEFAULT NULL,
@@ -329,17 +359,10 @@ CREATE TABLE `growth` (
   `operating_cf_cagr_3y` double DEFAULT NULL,
   `operating_cf_cagr_5y` double DEFAULT NULL,
   `operating_cf_cagr_10y` double DEFAULT NULL,
-  PRIMARY KEY (`ticker`,`date`,`period`),
+  PRIMARY KEY (`ticker`,`date`),
   CONSTRAINT `growth_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `income_stmt`
---
-
 DROP TABLE IF EXISTS `income_stmt`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -367,17 +390,12 @@ CREATE TABLE `income_stmt` (
   `eps_diluted` double DEFAULT NULL,
   `shares_outstanding` double DEFAULT NULL,
   `shares_outstanding_diluted` double DEFAULT NULL,
+  `filing_date` datetime DEFAULT NULL,
+  `accepted_date` datetime DEFAULT NULL,
   PRIMARY KEY (`ticker`,`date`,`period`),
   CONSTRAINT `income_stmt_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `income_stmt_growth`
---
-
 DROP TABLE IF EXISTS `income_stmt_growth`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -397,13 +415,61 @@ CREATE TABLE `income_stmt_growth` (
   CONSTRAINT `income_stmt_growth_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `metrics`
---
-
+DROP TABLE IF EXISTS `macro_daily`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `macro_daily` (
+  `date` date NOT NULL,
+  `inflation_exp` decimal(10,4) DEFAULT NULL,
+  `ted_spread` decimal(10,4) DEFAULT NULL,
+  `interest_rate` decimal(10,4) DEFAULT NULL,
+  `yield_curve` decimal(10,4) DEFAULT NULL,
+  `wti` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `macro_monthly`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `macro_monthly` (
+  `date` date NOT NULL,
+  `pmi` decimal(12,4) DEFAULT NULL,
+  `sahm_rule` decimal(10,4) DEFAULT NULL,
+  `recession` decimal(10,4) DEFAULT NULL,
+  `retail_sales` decimal(12,4) DEFAULT NULL,
+  `core_cpi` decimal(10,4) DEFAULT NULL,
+  `unrate` decimal(10,4) DEFAULT NULL,
+  `fedfunds` decimal(10,4) DEFAULT NULL,
+  `headline_cpi` decimal(10,4) DEFAULT NULL,
+  `consumer_sentiment` decimal(10,4) DEFAULT NULL,
+  `industrial_production` decimal(10,4) DEFAULT NULL,
+  `m2` decimal(12,4) DEFAULT NULL,
+  `pce` decimal(12,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `macro_quarterly`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `macro_quarterly` (
+  `date` date NOT NULL,
+  `potential_gdp` decimal(14,4) DEFAULT NULL,
+  `nominal_gdp` decimal(14,4) DEFAULT NULL,
+  `real_gdp` decimal(14,4) DEFAULT NULL,
+  `fedfunds` decimal(10,4) DEFAULT NULL,
+  `yield_curve` decimal(10,4) DEFAULT NULL,
+  `hy_spread` decimal(10,4) DEFAULT NULL,
+  `wti` decimal(10,4) DEFAULT NULL,
+  `unrate` decimal(10,4) DEFAULT NULL,
+  `sahm_rule` decimal(10,4) DEFAULT NULL,
+  `recession` decimal(10,4) DEFAULT NULL,
+  `headline_cpi` decimal(10,4) DEFAULT NULL,
+  `core_cpi` decimal(10,4) DEFAULT NULL,
+  `pce` decimal(12,4) DEFAULT NULL,
+  `m2` decimal(12,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `metrics`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -411,7 +477,6 @@ CREATE TABLE `metrics` (
   `ticker` varchar(10) NOT NULL,
   `date` date NOT NULL,
   `fiscal_year` varchar(10) DEFAULT NULL,
-  `period` varchar(10) NOT NULL,
   `market_cap` double DEFAULT NULL,
   `enterprise_value` double DEFAULT NULL,
   `ev_to_sales` double DEFAULT NULL,
@@ -440,47 +505,10 @@ CREATE TABLE `metrics` (
   `fcf_to_firm` double DEFAULT NULL,
   `tangible_asset_value` double DEFAULT NULL,
   `net_current_asset_value` double DEFAULT NULL,
-  PRIMARY KEY (`ticker`,`date`,`period`),
+  PRIMARY KEY (`ticker`,`date`),
   CONSTRAINT `metrics_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `profile`
---
-
-DROP TABLE IF EXISTS `profile`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `profile` (
-  `ticker` varchar(10) NOT NULL,
-  `company_name` varchar(255) DEFAULT NULL,
-  `price` double DEFAULT NULL,
-  `market_cap` double DEFAULT NULL,
-  `beta` double DEFAULT NULL,
-  `sector` varchar(100) DEFAULT NULL,
-  `industry` varchar(150) DEFAULT NULL,
-  `country` varchar(50) DEFAULT NULL,
-  `cik` int DEFAULT NULL,
-  `isin` varchar(20) DEFAULT NULL,
-  `cusip` varchar(20) DEFAULT NULL,
-  `exchange` varchar(20) DEFAULT NULL,
-  `ceo` varchar(100) DEFAULT NULL,
-  `full_time_employees` int DEFAULT NULL,
-  `ipo_date` date DEFAULT NULL,
-  `description` text,
-  PRIMARY KEY (`ticker`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `quotes`
---
-
 DROP TABLE IF EXISTS `quotes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -498,13 +526,6 @@ CREATE TABLE `quotes` (
   CONSTRAINT `quotes_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `ratings`
---
-
 DROP TABLE IF EXISTS `ratings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -520,16 +541,10 @@ CREATE TABLE `ratings` (
   `pe_score` int DEFAULT NULL,
   `pb_score` int DEFAULT NULL,
   PRIMARY KEY (`ticker`,`date`),
+  KEY `idx_ratings_date` (`date`),
   CONSTRAINT `ratings_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `ratios`
---
-
 DROP TABLE IF EXISTS `ratios`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -537,7 +552,6 @@ CREATE TABLE `ratios` (
   `ticker` varchar(10) NOT NULL,
   `date` date NOT NULL,
   `fiscal_year` varchar(10) DEFAULT NULL,
-  `period` varchar(10) NOT NULL,
   `gross_margin` double DEFAULT NULL,
   `ebit_margin` double DEFAULT NULL,
   `ebitda_margin` double DEFAULT NULL,
@@ -564,55 +578,10 @@ CREATE TABLE `ratios` (
   `dividend_payout_ratio` double DEFAULT NULL,
   `dividend_yield` double DEFAULT NULL,
   `effective_tax_rate` double DEFAULT NULL,
-  PRIMARY KEY (`ticker`,`date`,`period`),
+  PRIMARY KEY (`ticker`,`date`),
   CONSTRAINT `ratios_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `revenue_geographic_segmentation`
---
-
-DROP TABLE IF EXISTS `revenue_geographic_segmentation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `revenue_geographic_segmentation` (
-  `ticker` varchar(10) NOT NULL,
-  `date` date NOT NULL,
-  `fiscal_year` varchar(10) DEFAULT NULL,
-  `data` json DEFAULT NULL,
-  PRIMARY KEY (`ticker`,`date`),
-  CONSTRAINT `revenue_geographic_segmentation_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `profile` (`ticker`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `revenue_product_segmentation`
---
-
-DROP TABLE IF EXISTS `revenue_product_segmentation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `revenue_product_segmentation` (
-  `ticker` varchar(10) NOT NULL,
-  `date` date NOT NULL,
-  `fiscal_year` varchar(10) DEFAULT NULL,
-  `data` json DEFAULT NULL,
-  PRIMARY KEY (`ticker`,`date`),
-  CONSTRAINT `revenue_product_segmentation_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `profile` (`ticker`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
-
---
--- Table structure for table `scores`
---
-
 DROP TABLE IF EXISTS `scores`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -631,17 +600,67 @@ CREATE TABLE `scores` (
   CONSTRAINT `scores_ibfk_1` FOREIGN KEY (`ticker`) REFERENCES `companies` (`ticker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
+DROP TABLE IF EXISTS `sector_returns_daily`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sector_returns_daily` (
+  `date` date NOT NULL,
+  `utilities` decimal(10,4) DEFAULT NULL,
+  `consumer_staples` decimal(10,4) DEFAULT NULL,
+  `financials` decimal(10,4) DEFAULT NULL,
+  `communication_services` decimal(10,4) DEFAULT NULL,
+  `technology` decimal(10,4) DEFAULT NULL,
+  `materials` decimal(10,4) DEFAULT NULL,
+  `energy` decimal(10,4) DEFAULT NULL,
+  `real_estate` decimal(10,4) DEFAULT NULL,
+  `consumer_discretionary` decimal(10,4) DEFAULT NULL,
+  `industrials` decimal(10,4) DEFAULT NULL,
+  `healthcare` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `sector_returns_monthly`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sector_returns_monthly` (
+  `date` date NOT NULL,
+  `utilities` decimal(10,4) DEFAULT NULL,
+  `consumer_staples` decimal(10,4) DEFAULT NULL,
+  `financials` decimal(10,4) DEFAULT NULL,
+  `communication_services` decimal(10,4) DEFAULT NULL,
+  `technology` decimal(10,4) DEFAULT NULL,
+  `materials` decimal(10,4) DEFAULT NULL,
+  `energy` decimal(10,4) DEFAULT NULL,
+  `real_estate` decimal(10,4) DEFAULT NULL,
+  `consumer_discretionary` decimal(10,4) DEFAULT NULL,
+  `industrials` decimal(10,4) DEFAULT NULL,
+  `healthcare` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `sector_returns_quarterly`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sector_returns_quarterly` (
+  `date` date NOT NULL,
+  `utilities` decimal(10,4) DEFAULT NULL,
+  `consumer_staples` decimal(10,4) DEFAULT NULL,
+  `financials` decimal(10,4) DEFAULT NULL,
+  `communication_services` decimal(10,4) DEFAULT NULL,
+  `technology` decimal(10,4) DEFAULT NULL,
+  `materials` decimal(10,4) DEFAULT NULL,
+  `energy` decimal(10,4) DEFAULT NULL,
+  `real_estate` decimal(10,4) DEFAULT NULL,
+  `consumer_discretionary` decimal(10,4) DEFAULT NULL,
+  `industrials` decimal(10,4) DEFAULT NULL,
+  `healthcare` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-/*!50606 SET GLOBAL INNODB_STATS_AUTO_RECALC=@OLD_INNODB_STATS_AUTO_RECALC */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-02 10:14:06
