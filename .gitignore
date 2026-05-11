@@ -9,6 +9,7 @@ data/
 #config
 config/config.py
 
+CLAUDE.md
 # environment
 .env
 
